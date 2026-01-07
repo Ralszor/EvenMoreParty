@@ -1,0 +1,18 @@
+{
+    "id": "ral_party",
+    "authors": [
+		"Ralszor"
+    ],
+
+	"keybinds": [
+        {
+            "name": "Show Health",
+            "id": "showhealth",
+            "keys": ["v"]
+        }
+    ],
+
+	"config": {
+		
+	}
+}
