@@ -4,10 +4,37 @@ function AttackBox:init(battler, offset, index, x, y)
     super.init(self, battler, offset, index, x, y)
     if #Game.battle.party <= 3 then return end
     
-    self.bolt.height = math.floor(112 / #Game.battle.party)
-    self.head_sprite:setOrigin(0.5, 0.75 + (2 * (#Game.battle.party - 4) * 0.075))
-    self.press_sprite:setOrigin(0, (#Game.battle.party - 4) * 0.025)
-    self.head_sprite:setScale(1 - ((#Game.battle.party - 4) * 0.125))
+    self.bolt.height = math.floor(112 / 3)
+    self.head_sprite:setOrigin(0.5, 0.5)
+    self.press_sprite:setOrigin(0, 0)
+    if index > 3 then
+        self.head_sprite:setScale(0)
+    else
+        self.head_sprite:setScale(1)
+    end
+end
+
+function AttackBox:hit()
+    local p = math.abs(self:getClose())
+
+    self.attacked = true
+
+    self.bolt:burst()
+    self.bolt.layer = 1
+    self.bolt:setPosition(self.bolt:getRelativePos(0, 0, self.parent))
+    self.bolt:setParent(self.parent)
+    if p <= 0.25 then
+        self.bolt:setColor(1, 1, 0)
+        self.bolt.burst_speed = 0.2
+        return 150
+    elseif p <= 1.3 then
+        return 120
+    elseif p <= 2.6 then
+        return 110
+    else
+        self.bolt:setColor(self.battler.chara:getDamageColor())
+        return 100 - (p * 2)
+    end
 end
 
 function AttackBox:update()
@@ -21,7 +48,7 @@ function AttackBox:update()
         self.afterimage_timer = self.afterimage_timer + DTMULT/2
         while math.floor(self.afterimage_timer) > self.afterimage_count do
             self.afterimage_count = self.afterimage_count + 1
-            local afterimg = AttackBar(self.bolt.x, 0, 6, #Game.battle.party > 3 and math.floor(112/#Game.battle.party) or 38)
+            local afterimg = AttackBar(self.bolt.x, 0, 6, 38)
             afterimg.layer = 3
             afterimg.alpha = 0.4
             afterimg:fadeOutSpeedAndRemove()
@@ -30,13 +57,6 @@ function AttackBox:update()
     end
 
     local pressed_confirm = false
-    if Mod.libs["multiplayer"] then -- Compatibility with 'multiplayer' Library.
-        for i = 2, math.min(Mod.libs["multiplayer"].max_players, #Game.battle.party) do
-            if Input.pressed("p".. i .."_confirm") then
-                pressed_confirm = true
-            end
-        end
-    end
 
     if not Game.battle.cancel_attack and (Input.pressed("confirm") or pressed_confirm) then
         self.flash = 1
@@ -61,7 +81,7 @@ function AttackBox:draw()
             local ch1_offset = Game:getConfig("oldUIPositions") and #Game.battle.party <= 4
 
             Draw.setColor(box_color)
-            local height = #Game.battle.party > 3 and math.floor(104 / #Game.battle.party) or 36
+            local height = 36
             
             love.graphics.rectangle("line", 80, ch1_offset and 0 or 1, (15 * self.BOLTSPEED) + 3, height + (ch1_offset and 1 or 0))
 

@@ -1,5 +1,9 @@
 local BattleUI, super = HookSystem.hookScript(BattleUI)
-      
+function BattleUI:init()
+    super.init(self)
+    self.adraw = 0
+end
+
 function BattleUI:beginAttack()
     if #Game.battle.party <= 3 then super.beginAttack(self) return end
     local attack_order = Utils.pickMultiple(Game.battle.normal_attackers, #Game.battle.normal_attackers)
@@ -9,13 +13,13 @@ function BattleUI:beginAttack()
         self.attack_boxes = {}
         local last_offset = 0
         local offset = 0
-        local height = math.floor(112 / #Game.battle.party)
+        local height = math.floor(112 / 3)
         for i = 1, #attack_order do
         offset = offset + last_offset
         local battler = attack_order[i]
         local index = Game.battle:getPartyIndex(battler.chara.id)
-        local attack_box = AttackBox(battler, 30 + offset, index, 0, 40 + (height * (index - 1)))
-        attack_box.layer = -10 + (index * 0.01)
+        local attack_box = AttackBox(battler, 30 + offset, index, 0, 40 + (height * (MathUtils.wrap(index-1, 0, 3))))
+        attack_box.layer = -10 - (index * 0.01)
         self:addChild(attack_box)
         table.insert(self.attack_boxes, attack_box)
         if i < #attack_order and last_offset ~= 0 then
@@ -30,7 +34,7 @@ end
 function BattleUI:update()
     super.update(self)
     for k, box in ipairs(Game.battle.battle_ui.action_boxes) do
-        box.x = MathUtils.lerp(box.x, (k-MathUtils.clamp(Game.battle.current_selecting-2, 1, #Game.battle.party))*213, 0.3)
+        box.x = MathUtils.lerp(box.x, (k-MathUtils.clamp(Game.battle.current_selecting-1, 1, #Game.battle.party-2))*213, 0.3)
     end
 end
 
@@ -38,19 +42,21 @@ function BattleUI:draw()
     super.draw(self)
     love.graphics.translate(0,-330)
     if Input.down("showhealth") then
-        Draw.setColor(0,0,0,0.6)
+        self.adraw = self.adraw + 4*DT
+        self.adraw = MathUtils.clamp(self.adraw, 0, 1)
+        Draw.setColor(0,0,0,self.adraw-0.6)
         Draw.rectangle("fill",0,0,SCREEN_WIDTH, (#Game.battle.party * 30)+ 13)
         for k, party in ipairs(Game.battle.party) do
             local head = Assets.getTexture(party.chara:getHeadIcons().."/head")
             local name = Assets.getTexture(party.chara:getNameSprite())
-            Draw.setColor(1,1,1,1)
+            Draw.setColor(1,1,1,self.adraw)
             Draw.draw(head, 15, 10 + 30*(k-1))
             Draw.draw(name, 65, 15 + 30*(k-1))
             
             Draw.setColor(PALETTE["action_health_bg"])
             Draw.rectangle("fill", 140, (30*(k-1))+name:getHeight()+3, 100, 10)
             local health = (party.chara:getHealth() / party.chara:getStat("health")) * 100
-            Draw.setColor(party.chara:getColor())
+            Draw.setColor(party.chara.color[1], party.chara.color[2], party.chara.color[3], self.adraw)
             if health > 0 then
                 Draw.rectangle("fill", 140, (30*(k-1))+name:getHeight()+3, math.ceil(health), 10)
             end
@@ -73,15 +79,17 @@ function BattleUI:draw()
             local health_offset = 0
             health_offset = (#tostring(party.chara:getHealth()) - 1) * 8
         
-            Draw.setColor(color)
+            Draw.setColor(color[1], color[2], color[3], self.adraw)
             love.graphics.print(party.chara:getHealth(), 250, h)
             Draw.setColor(PALETTE["action_health_text"])
             love.graphics.print("/", (260+health_offset), h)
             local string_width = g:getWidth(tostring(party.chara:getStat("health")))
-            Draw.setColor(color)
+            Draw.setColor(color[1], color[2], color[3], self.adraw)
             love.graphics.print(party.chara:getStat("health"), (280 + health_offset), h)
             --Draw.rectangle("fill", 75 + name:getWidth(), (30*(k-1))+name:getHeight()+5, math.ceil(health), 10)
         end
+    else
+        self.adraw = 0
     end
 end
 
