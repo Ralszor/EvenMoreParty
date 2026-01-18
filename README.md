@@ -6,7 +6,7 @@ Party health shown to a side in the menu ![image](githubshit/fullview.png)
 
 <br>
 
-Wacky gradienting to show extras in the equip menu ![image](githubshit/preview-1.png)
+Wacky gradienting to show extras in the equip/power menu ![image](githubshit/preview-1.png)
 
 <br>
 
