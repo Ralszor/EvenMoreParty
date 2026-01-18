@@ -38,6 +38,7 @@ There are a few NECESSITIES to this SUPER COOL LICENSE!
 9B. You can rename this license to whatever fits your licensing license's need, in order to be licensed
 9C. license
 
-10. paypal me $500 USD
+10. paypal me $500 USD (optional but i want the free moniey)
+11. love.graphics.setShader(7)
 
 okay bye have fun

@@ -2,6 +2,7 @@ local BattleUI, super = HookSystem.hookScript(BattleUI)
 function BattleUI:init()
     super.init(self)
     self.adraw = 0
+    self.adraw2 = 0
 end
 
 function BattleUI:beginAttack()
@@ -40,7 +41,47 @@ end
 
 function BattleUI:draw()
     super.draw(self)
-    love.graphics.translate(0,-330)
+    love.graphics.translate(0,30)
+    if Game.battle.state == "DEFENDING" then
+        self.adraw2 = self.adraw2 + 4*DT
+        self.adraw2 = MathUtils.clamp(self.adraw2, 0, 1)
+        for e, party in ipairs(Game.battle.party) do
+            if e > 3 then
+                -- local tex = Assets.getTexture(party.chara:getHeadIcons().."/head")
+				local tex = self.action_boxes[e].head_sprite.texture
+                Draw.setColor(1,1,1,self.adraw2)
+                if e <= 8 then
+                    Draw.draw(tex, 130 * (e-4), 10)
+                elseif e <= 13 then
+                    Draw.draw(tex, 130 * (e-9), 50)
+                elseif e > 13 then
+                    Draw.draw(tex, 130 * (e-13), 90)
+                end
+                local health = (party.chara:getHealth() / party.chara:getStat("health")) * 100
+                local color = {1,1,1,self.adraw2}
+                
+                if health <= 0 then
+                    color = {1,0,0,self.adraw2}
+                elseif (party.chara:getHealth() <= (party.chara:getStat("health") / 4)) then
+                    color = {1,1,0,self.adraw2}
+                else
+                    color = {1,1,1,self.adraw2}
+                end
+                Draw.setColor(color)
+                love.graphics.setFont(Assets.getFont("smallnumbers"))
+                if e <= 8 then
+                    love.graphics.print(party.chara.health.."/"..party.chara.stats.health, (130 * (e-4))+tex:getWidth()+5, 20)
+                elseif e <= 13 then
+                    love.graphics.print(party.chara.health.."/"..party.chara.stats.health, (130 * (e-9))+tex:getWidth()+5, 60)
+                elseif e > 13 then
+                    love.graphics.print(party.chara.health.."/"..party.chara.stats.health, (130 * (e-13))+tex:getWidth()+5, 100)
+                end
+            end
+        end
+    else
+        self.adraw2 = 0
+    end
+    love.graphics.translate(0,-360)
     if Input.down("showhealth") then
         self.adraw = self.adraw + 4*DT
         self.adraw = MathUtils.clamp(self.adraw, 0, 1)

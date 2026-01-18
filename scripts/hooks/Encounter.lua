@@ -25,5 +25,15 @@ function Encounter:getPartyPosition(index)
     return x, y
 end
 
+--function Encounter:onStateChange(old, new, reason)
+--    if #Game.battle.party <= 3 then super.onStateChange(self, old, new, reason) return end
+--    if new == "DEFENDING" then
+--        self:addChild(Rectangle(100, 100, 100, 100))
+--       for e, party in ipairs(Game.battle.party) do
+--            local tex = Assets.getTexture(party.chara:getHeadIcons().."/head")
+--            Draw.draw(tex, 30 * (e-1), 10)
+--       end
+--    end
+--end
 
 return Encounter
