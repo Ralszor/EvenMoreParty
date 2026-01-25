@@ -2,6 +2,7 @@
 ---@overload fun(...) : DarkMenu
 local DarkMenu, super = HookSystem.hookScript(DarkMenu)
 
+
 function DarkMenu:updateSelectedBoxes()
     if #Game.party <= 3 then return super.updateSelectedBoxes(self) end
     for _, actionbox in ipairs(Game.world.healthbar.action_boxes) do

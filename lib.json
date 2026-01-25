@@ -13,6 +13,11 @@
     ],
 
 	"config": {
-		
+		"attackType": "wrap" //TODO: add types.
+        
+        //"wrap", "oneLane", "expanded"
+        //"wrap" makes all attackBoxes wrap per 3 party members. i.e; Kris, Susie, Ralsei. Noelle would be layered under Kris, and Berdly under Susie.
+        //"oneLane" stacks all boxes onto Kris. Basically a multibar attack on steroids.
+        //"expanded" makes a new UIBox and puts everyone in line, basically how FiraRain's MoreParty did it without squishing.
 	}
 }
