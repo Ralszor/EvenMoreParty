@@ -40,47 +40,40 @@ function DarkMenu:draw()
     love.graphics.origin()
     for k, party in ipairs(Game.party) do
         if k > 3 then
-            Draw.setColor(1,1,1,1)
+            local col = math.floor((k - 4) / 11)
+            local row = (k - 4) % 11
+
+            local x_head  = MathUtils.rangeMap(self.y, -80, 0, -100, 20  + col * 150)
+            local x_bar   = MathUtils.rangeMap(self.y, -80, 0, -100, 60  + col * 150)
+            local x_text  = MathUtils.rangeMap(self.y, -80, 0, -100, 60  + col * 150)
+            local y_pos   = 90 + 30 * row
+
+            Draw.setColor(1, 1, 1, 1)
             local a = Assets.getTexture(party:getHeadIcons().."/head")
-            if k >=15 then
-                Draw.draw(a, MathUtils.rangeMap(self.y, -80, 0, -100, 170), 60+30*(k-14))
-            else
-                Draw.draw(a, MathUtils.rangeMap(self.y, -80, 0, -100, 20), 60+30*(k-3))
-            end
-            local color
-            Draw.setColor(PALETTE["action_health_bg"])
+            Draw.draw(a, x_head, y_pos)
+
             local health = (party:getHealth() / party:getStat("health")) * 100
-            if k >= 15 then
-                Draw.rectangle("fill",MathUtils.rangeMap(self.y, -80, 0, -100, 210),70+30*(k-14), 100, 10)
-                Draw.setColor(party:getColor())
-                Draw.rectangle("fill",MathUtils.rangeMap(self.y, -80, 0, -100, 210),70+30*(k-14), math.ceil(health), 10)
-            else
-                Draw.rectangle("fill",MathUtils.rangeMap(self.y, -80, 0, -100, 60),70+30*(k-3), 100, 10)
-                Draw.setColor(party:getColor())
-                Draw.rectangle("fill",MathUtils.rangeMap(self.y, -80, 0, -100, 60),70+30*(k-3), math.ceil(health), 10)
-            end
+            Draw.setColor(PALETTE["action_health_bg"])
+            Draw.rectangle("fill", x_bar, y_pos + 10, 100, 10)
+            Draw.setColor(party:getColor())
+            Draw.rectangle("fill", x_bar, y_pos + 10, math.ceil(health), 10)
+
             love.graphics.setFont(Assets.getFont("smallnumbers"))
+            local color
             if (party:getHealth() <= (party:getStat("health") / 4)) then
                 color = PALETTE["action_health_text_low"]
             else
                 color = PALETTE["action_health_text"]
             end
+
             Draw.setColor(COLORS.black)
-            for x=-1, 1 do
-                for y=-1, 1 do
-                    if k >= 15 then
-                        love.graphics.print(party:getHealth().."/"..party:getStat("health"),MathUtils.rangeMap(self.y, -80, 0, -100, 210)+x, 60+30*(k-14)+y)
-                    else
-                        love.graphics.print(party:getHealth().."/"..party:getStat("health"),MathUtils.rangeMap(self.y, -80, 0, -100, 60)+x, 60+30*(k-3)+y)
-                    end
+            for x = -1, 1 do
+                for y = -1, 1 do
+                    love.graphics.print(party:getHealth().."/"..party:getStat("health"), x_text + x, y_pos + y)
                 end
             end
             Draw.setColor(color)
-            if k >= 15 then
-                love.graphics.print(party:getHealth().."/"..party:getStat("health"),MathUtils.rangeMap(self.y, -80, 0, -100, 210), 60+30*(k-14))
-            else
-                love.graphics.print(party:getHealth().."/"..party:getStat("health"),MathUtils.rangeMap(self.y, -80, 0, -100, 60), 60+30*(k-3))
-            end
+            love.graphics.print(party:getHealth().."/"..party:getStat("health"), x_text, y_pos)
         end
     end
     Draw.setColor(1,1,1,1)

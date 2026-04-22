@@ -47,40 +47,41 @@ function BattleUI:draw()
         self.adraw2 = MathUtils.clamp(self.adraw2, 0, 1)
         for e, party in ipairs(Game.battle.party) do
             if e > 3 then
-                -- local tex = Assets.getTexture(party.chara:getHeadIcons().."/head")
-				local tex = self.action_boxes[e].head_sprite.texture
-                Draw.setColor(1,1,1,self.adraw2)
-                if e <= 8 then
-                    Draw.draw(tex, 130 * (e-4), 10)
-                elseif e <= 13 then
-                    Draw.draw(tex, 130 * (e-9), 50)
-                elseif e > 13 then
-                    Draw.draw(tex, 130 * (e-13), 90)
-                end
+                local col = (e - 4) % 5        -- 0,1,2,3,4, 0,1,2,3,4...
+                local row = math.floor((e - 4) / 5)  -- 0,0,0,0,0, 1,1,1,1,1...
+
+                local x = 130 * col
+                local y = 10 + 40 * row
+
+                local tex = self.action_boxes[e].head_sprite.texture
+                local col = (e - 4) % 5        -- 0,1,2,3,4, 0,1,2,3,4...
+                local row = math.floor((e - 4) / 5)  -- 0,0,0,0,0, 1,1,1,1,1...
+
+                local x = 130 * col
+                local y = 10 + 40 * row
+
+                Draw.setColor(1, 1, 1, self.adraw2)
+                Draw.draw(tex, x, y)
+
                 local health = (party.chara:getHealth() / party.chara:getStat("health")) * 100
-                local color = {1,1,1,self.adraw2}
-                
+                local color
                 if health <= 0 then
-                    color = {1,0,0,self.adraw2}
+                    color = {1, 0, 0, self.adraw2}
                 elseif (party.chara:getHealth() <= (party.chara:getStat("health") / 4)) then
-                    color = {1,1,0,self.adraw2}
+                    color = {1, 1, 0, self.adraw2}
                 else
-                    color = {1,1,1,self.adraw2}
+                    color = {1, 1, 1, self.adraw2}
                 end
+
                 Draw.setColor(color)
                 love.graphics.setFont(Assets.getFont("smallnumbers"))
-                if e <= 8 then
-                    love.graphics.print(party.chara.health.."/"..party.chara.stats.health, (130 * (e-4))+tex:getWidth()+5, 20)
-                elseif e <= 13 then
-                    love.graphics.print(party.chara.health.."/"..party.chara.stats.health, (130 * (e-9))+tex:getWidth()+5, 60)
-                elseif e > 13 then
-                    love.graphics.print(party.chara.health.."/"..party.chara.stats.health, (130 * (e-13))+tex:getWidth()+5, 100)
-                end
+                love.graphics.print(party.chara.health.."/"..party.chara.stats.health, x + tex:getWidth() + 5, y + 10)
             end
         end
     else
         self.adraw2 = 0
     end
+
     love.graphics.translate(0,-360)
     if Input.down("showhealth") then
         self.adraw = self.adraw + 4*DT
@@ -93,7 +94,7 @@ function BattleUI:draw()
             Draw.setColor(1,1,1,self.adraw)
             Draw.draw(head, 15, 10 + 30*(k-1))
             Draw.draw(name, 65, 15 + 30*(k-1))
-            
+
             Draw.setColor(PALETTE["action_health_bg"])
             Draw.rectangle("fill", 140, (30*(k-1))+name:getHeight()+3, 100, 10)
             local health = (party.chara:getHealth() / party.chara:getStat("health")) * 100
@@ -103,11 +104,11 @@ function BattleUI:draw()
             end
 
             local g = Assets.getFont("smallnumbers")
-            local h = (30*(k-1))+name:getHeight()+3 --Shameful realization i should have done this sooner
-            
+            local h = (30*(k-1))+name:getHeight()+3
+
             love.graphics.setFont(g)
             local color = PALETTE["action_health_text"]
-            
+
             if health <= 0 then
                 color = PALETTE["action_health_text_down"]
             elseif (party.chara:getHealth() <= (party.chara:getStat("health") / 4)) then
@@ -115,11 +116,9 @@ function BattleUI:draw()
             else
                 color = PALETTE["action_health_text"]
             end
-        
-        
-            local health_offset = 0
-            health_offset = (#tostring(party.chara:getHealth()) - 1) * 8
-        
+
+            local health_offset = (#tostring(party.chara:getHealth()) - 1) * 8
+
             Draw.setColor(color[1], color[2], color[3], self.adraw)
             love.graphics.print(party.chara:getHealth(), 250, h)
             Draw.setColor(PALETTE["action_health_text"])
@@ -127,7 +126,6 @@ function BattleUI:draw()
             local string_width = g:getWidth(tostring(party.chara:getStat("health")))
             Draw.setColor(color[1], color[2], color[3], self.adraw)
             love.graphics.print(party.chara:getStat("health"), (280 + health_offset), h)
-            --Draw.rectangle("fill", 75 + name:getWidth(), (30*(k-1))+name:getHeight()+5, math.ceil(health), 10)
         end
     else
         self.adraw = 0
